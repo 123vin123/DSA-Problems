@@ -1,0 +1,103 @@
+// Google Problem - > Android Unlock Patterns
+Solution -> 
+1 - First notice the constraint carefully.
+2 - Two movements are possible - > 
+   a - > single step movement.(Adjacent moves(left, right, up ,down), diagonal moves and extended moves(Knight moves)
+   b - > SKIP_DOT_MOVES(Straight Skip Moves (Horizontal & Vertical)) and Diagonal Skip Moves
+example ->
+These moves are two steps in a straight line, skipping over a middle dot:
+{0, 2} → Moves two steps right, skipping (0,1)
+{0, -2} → Moves two steps left, skipping (0,1)
+These moves are two steps diagonally, skipping over a middle dot:
+{-2, -2} → Moves two steps diagonally up-left, skipping (-1, -1).
+3- After this explore all possible paths and increment the ans.
+4. When exploring the skip_dot_moves first find the middle cell and check it is already visited or not.
+
+------------------------------------------------------------------------------------------------CODE --------------------------------------------------------------------------------------------------------------
+class Solution {
+    private static final int[][] SINGLE_STEP_MOVES = {
+         { 0, 1 },
+        { 0, -1 },
+        { 1, 0 },
+        { -1, 0 }, // Adjacent moves (right, left, down, up)
+        { 1, 1 },
+        { -1, 1 },
+        { 1, -1 },
+        { -1, -1 }, // Diagonal moves
+        { -2, 1 },
+        { -2, -1 },
+        { 2, 1 },
+        { 2, -1 }, // Extended moves (knight-like moves)
+        { 1, -2 },
+        { -1, -2 },
+        { 1, 2 },
+        { -1, 2 },
+    };
+
+    private static final int[][] SKIP_DOT_MOVES = {
+            { 0, 2 },
+        { 0, -2 },
+        { 2, 0 },
+        { -2, 0 }, // Straight skip moves (e.g., 1 to 3, 4 to 6)
+        { -2, -2 },
+        { 2, 2 },
+        { 2, -2 },
+        { -2, 2 },
+    };
+    public int numberOfPatterns(int m, int n) {
+        int totalPatterns = 0;
+        for(int row = 0; row < 3; row++){
+            for(int col = 0; col < 3; col++){
+                boolean[][] vis = new boolean[3][3];
+                totalPatterns += countPatternsFromDot(m,n, 1, row, col,vis);
+            }
+        }
+        return totalPatterns;
+    }
+    private int countPatternsFromDot(int m, int n, int currLen,int currRow, int currCol,boolean[][] vis){
+        if(currLen > n){
+            return 0;
+        }
+        int validPatterns = 0;
+        if(currLen >= m){
+            validPatterns++;
+        }
+        vis[currRow][currCol] = true;
+        for(int[] move : SINGLE_STEP_MOVES){
+            int newRow = currRow + move[0];
+            int newCol = currCol + move[1];
+            if(isValid(newRow, newCol,vis)){
+                validPatterns += countPatternsFromDot(m, n, currLen+1, newRow, newCol, vis);
+            }
+        }
+        for(int[] move : SKIP_DOT_MOVES){
+            int newRow = currRow + move[0];
+            int newCol = currCol + move[1];
+            if(isValid(newRow, newCol,vis)){
+                int midddleRow = currRow + move[0]/2;
+                int midddleCol = currCol + move[1]/2;
+                if(vis[midddleRow][midddleCol]){
+                    validPatterns += countPatternsFromDot(m, n, currLen+1, newRow, newCol, vis);
+                }
+            }
+        }
+        // use backtraling
+        vis[currRow][currCol] = false;
+        return validPatterns;
+    }
+
+    private boolean isValid(int row, int col, boolean[][] vis){
+        return (row >= 0 && col >= 0 && row < 3 && col < 3 && !vis[row][col]);
+    }
+}
+
+
+
+--------------------------------------------------------------------------Time Cpmplexity---------------------------------------------------------------------
+Here we are exploring all the possible paths using backtracking. We are traversing over whole grid
+So Time complexity:O(9⋅8^n)
+The methodnumberOfPatternsiterates through all9dots on the grid as a starting point.
+In each call tocountPatternsFromDot, the function explores all possible moves from the current dot. Let8be the approximate number of choices at each dot. In the worst-case scenario, each recursive call leads to further recursive calls, up to a maximum depth ofn. Thus, the total number of patterns explored can be approximated by 9×8^n (each move branching out into multiple further moves).
+Thus, the overall time complexity of the algorithm isO(9⋅8^n).
+---------------------------------------------------------------------------Space Complexity=------------------------------------------------------
+The maximum depth of the recursion stack is n.
