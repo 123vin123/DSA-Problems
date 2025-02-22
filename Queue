@@ -1,0 +1,76 @@
+Problem -> Time Taken to Cross the Door
+Problem Statement -> 
+There are n persons numbered from 0 to n - 1 and a door. Each person can enter or exit through the door once, taking one second.You are given a non-decreasing integer array arrival of size n, where arrival[i] is the arrival 
+time of the ith person at the door. You are also given an array state of size n, where state[i] is 0 if person i wants to enter through the door or 1 if they want to exit through the door.
+If two or more persons want to use the door at the same time, they follow the following rules:
+If the door was not used in the previous second, then the person who wants to exit goes first.
+If the door was used in the previous second for entering, the person who wants to enter goes first.
+If the door was used in the previous second for exiting, the person who wants to exit goes first.
+If multiple persons want to go in the same direction, the person with the smallest index goes first.
+Return an array answer of size n where answer[i] is the second at which the ith person crosses the door.
+Note that:
+Only one person can cross the door at each second.
+A person may arrive at the door and wait without entering or exiting to follow the mentioned rules.
+
+Companies tag -> Google, IMC, Amazon.
+
+Solution -> 
+
+
+Take two queue one for exit and other for enter.
+There can be 4 states at any time:
+1) No one is at the door
+2) Some people are exiting but no one is entering
+3) Some people are entering but no one is exiting
+4) There are people at both sides of the door
+
+
+
+Code - > 
+
+class Solution {
+public:
+    vector<int> timeTaken(vector<int>& arrival, vector<int>& state) {
+        int sz = arrival.size();
+        int t = 0, door = 0;
+        vector<int>ans(sz, 0);
+        queue<pair<int, int>>enter,exit;
+        for(int i = 0;  i < sz; i++){
+            if(state[i]){
+                exit.push({arrival[i] , i});
+            }
+            else{
+                enter.push({arrival[i] , i});
+            }
+        }
+        while(!exit.empty() || !enter.empty()){
+            if((exit.empty() || exit.front().first > t)  && (enter.empty() || enter.front().first > t)){
+                door = 0;
+            }
+            else if(!exit.empty() && exit.front().first <= t && (enter.empty() || enter.front().first > t)){
+                ans[exit.front().second] = t;
+                door = 2;
+                exit.pop();
+            }
+            else if ((exit.empty() || exit.front().first > t) && !enter.empty() && enter.front().first <= t){
+                ans[enter.front().second] = t;
+                enter.pop();
+                door = 1;
+            }
+            else{
+                if(door == 0 || door == 2){
+                    ans[exit.front().second] = t;
+                    door = 2;
+                    exit.pop();
+                }
+                else{
+                    ans[enter.front().second] = t;
+                    door = 1;
+                    enter.pop();
+                }
+            }
+            t++; 
+        }
+        return ans;
+    }
+};
