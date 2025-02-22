@@ -1,0 +1,78 @@
+Problem -> Simple Bank System
+Statement -> https://leetcode.com/problems/simple-bank-system/description/?envType=problem-list-v2&envId=design
+
+Approach -: 
+This problem is simple but as design perspective use thread safe approach in the interview.
+Use validAccount method for checking the validation
+
+Implementation :-
+
+class Bank {
+       private final long[] balance;
+         private final ReentrantLock lock = new ReentrantLock(); 
+    public Bank(long[] balance) {
+            this.balance = balance;
+    }
+    private boolean isValidAccount(int account){
+        return account >= 1 && account <= balance.length;
+    }
+    
+    public boolean transfer(int account1, int account2, long money) {
+          // lock before modifyingg the balance
+          lock.lock();
+          try {
+            if(!isValidAccount(account1) || !isValidAccount(account2) || balance[account1 - 1] < money){
+                return false;
+            }
+            balance[account1 - 1] -= money;
+            balance[account2 - 1] += money;
+            return true;
+          } catch (Exception e) {
+               throw e;
+          }
+          finally {
+            lock.unlock();
+          }
+    }
+    
+    public boolean deposit(int account, long money) {
+        lock.lock();
+         try {
+            if(!isValidAccount(account)){
+                return false;
+            }
+               balance[account - 1] += money;
+               return true;
+         }
+          catch (Exception e) {
+           throw e;
+         }
+         finally {
+            lock.unlock();
+         }
+    }
+    
+    public boolean withdraw(int account, long money) {
+          lock.lock();
+          try {
+                if(!isValidAccount(account) || balance[account - 1] < money){
+                    return false;
+                }
+                balance[account - 1] -= money;
+                return true;
+          } catch (Exception e) {
+           throw e;
+          }
+          finally {
+            lock.unlock();
+          }
+    }
+}
+
+/**
+ * Your Bank object will be instantiated and called as such:
+ * Bank obj = new Bank(balance);
+ * boolean param_1 = obj.transfer(account1,account2,money);
+ * boolean param_2 = obj.deposit(account,money);
+ * boolean param_3 = obj.withdraw(account,money);
+ */
