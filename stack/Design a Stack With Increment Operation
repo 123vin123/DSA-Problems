@@ -1,0 +1,89 @@
+Problem link -: https://leetcode.com/problems/design-a-stack-with-increment-operation/description/
+
+Approach - 1 -> 
+Use stack with array and a pointer topIdx to point to the top element.But due to its fixed size memory will waste.
+
+Approach 2 -> 
+Use linkedList. The linked list implementation is similar to the array-based approach, but it optimizes space usage. Instead of modifying the element at a specifictopIndex, the push operation adds a new node 
+to the tail of the linked list, and the pop operation removes the tail node. The increment operation remains largely the same: we iterate through the firstkelements (or all elements if the list has fewer thanknodes) and 
+update their values.
+
+Code - > 
+class CustomStack {
+     private int[] st;
+     private int topIdx;
+    public CustomStack(int maxSize) {
+         st = new int[maxSize];
+         topIdx = -1;
+    }
+    
+    public void push(int x) {
+         if(topIdx < st.length - 1){
+          topIdx++;
+           st[topIdx] = x;
+         }
+        
+    }
+    
+    public int pop() {
+        int tmp = -1;
+      if(topIdx != -1){
+       tmp = st[topIdx];
+       topIdx--;
+      }
+      return tmp;
+    }
+    
+    public void increment(int k, int val) {
+        for(int i = 0; i < Math.min(k, topIdx+1); i++){
+            st[i] += val;
+        }
+    }
+}
+
+Approach 3 -> 
+Optimised apporoach will be use of Array  Lazy Propagation
+the all operations will be O(1).
+
+Code -> 
+
+class CustomStack {
+    private int[] st;  // Stack to store elements
+    private int[] inc; // Increment array to store lazy updates
+    private int topIdx; // Index of the top element
+
+    public CustomStack(int maxSize) {
+        st = new int[maxSize];
+        inc = new int[maxSize]; // Stores incremental updates
+        topIdx = -1;
+    }
+    
+    public void push(int x) {
+        if (topIdx < st.length - 1) {
+            topIdx++;
+            st[topIdx] = x;  // Add the element
+            inc[topIdx] = 0; // Initialize increment value
+        }
+    }
+    
+    public int pop() {
+        if (topIdx == -1) return -1; // Stack is empty
+        
+        int res = st[topIdx] + inc[topIdx]; // Apply lazy increment
+        
+        if (topIdx > 0) {
+            inc[topIdx - 1] += inc[topIdx]; // Pass down the increment
+        }
+
+        topIdx--; // Remove the top element
+        return res;
+    }
+    
+    public void increment(int k, int val) {
+        int idx = Math.min(k, topIdx + 1) - 1;  // -1 for 1 based indexing
+        if (idx >= 0) {
+            inc[idx] += val; // Store the increment lazily
+        }
+    }
+}
+
