@@ -1,0 +1,103 @@
+Problem link : https://leetcode.com/problems/design-hashset/
+
+Solution 1: 
+Using Fixed Size boolean Array
+Code : 
+class MyHashSet {
+    private boolean[] bucket;
+    private static final int MAX_KEY = 1000000;
+
+    public MyHashSet() {
+        bucket = new boolean[MAX_KEY+1];
+    }
+    
+    public void add(int key) {
+        // set the corresponding idx to true
+        bucket[key] = true;
+    }
+    
+    public void remove(int key) {
+        bucket[key] = false;
+    }
+    
+    public boolean contains(int key) {
+        return bucket[key];
+    }
+}
+
+/**
+ * Your MyHashSet object will be instantiated and called as such:
+ * MyHashSet obj = new MyHashSet();
+ * obj.add(key);
+ * obj.remove(key);
+ * boolean param_3 = obj.contains(key);
+ */
+
+**Time Complexity:** O(1)  
+**Space Complexity:** O(Size)
+
+Solution 2:
+Create an array of buckets (linked lists or dynamic arrays)
+Use a hash function to map keys to bucket indices
+Operations:
+add(key): Hash key to bucket, add if not present in that bucket
+contains(key): Hash key to bucket, search within that bucket
+remove(key): Hash key to bucket, remove from that bucket if found
+
+Performance Analysis:
+Best Case: All keys hash to different buckets → O(1) for all operations
+Average Case: Keys distributed relatively evenly → O(1) for all operations
+Worst Case: All keys hash to same bucket → O(n) for all operations
+Space: O(k + m) where k = number of stored keys, m = bucket count
+
+Code:
+class MyHashSet {
+
+private static final int BUCKET_COUNT = 1009;
+private List<Integer>[] buckets;
+
+    public MyHashSet() {
+                // Initialize array of lists (buckets)
+        buckets = new List[BUCKET_COUNT];
+         // Initialize each bucket as an empty LinkedList
+        for(int i = 0; i < BUCKET_COUNT; i++){
+            buckets[i] = new LinkedList<>();
+        }
+    }
+    /**
+     * Hash function to map key to bucket index
+     * Using modulo with a prime number for better distribution
+     */
+     private int hash(int key){
+        return key % BUCKET_COUNT;
+     }
+    
+    public void add(int key) {
+        int bucketIdx = hash(key);
+        List<Integer>bucket = buckets[bucketIdx];
+        if(!bucket.contains(key)){
+            bucket.add(key);
+        }
+    }
+    
+    public void remove(int key) {
+        int bucketIdx = hash(key);
+        List<Integer>bucket = buckets[bucketIdx];
+          // Remove the key if it exists (Integer wrapper for object removal)
+        bucket.remove(Integer.valueOf(key));
+    }
+    
+    public boolean contains(int key) {
+        int bucketIdx = hash(key);
+        List<Integer>bucket = buckets[bucketIdx];
+        return bucket.contains(key);
+    }
+}
+
+/**
+ * Your MyHashSet object will be instantiated and called as such:
+ * MyHashSet obj = new MyHashSet();
+ * obj.add(key);
+ * obj.remove(key);
+ * boolean param_3 = obj.contains(key);
+ */
