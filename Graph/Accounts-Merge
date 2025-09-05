@@ -1,0 +1,85 @@
+Problem Link: https://leetcode.com/problems/accounts-merge/
+
+Approach: 1
+
+The DFS approach treats this problem as finding connected components in a graph where:
+
+Nodes: Individual accounts
+Edges: Shared emails between accounts
+
+Algorithm Steps:
+Build Email-to-Accounts Mapping: Create a map where each email points to all accounts that contain it
+Build Account Graph: For each account, connect it to all other accounts that share any email
+DFS Traversal: From each unvisited account, perform DFS to find all connected accounts (same person)
+Collect & Sort: For each connected component, gather all unique emails, sort them, and format the result
+
+Code:
+class Solution {
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        // build email and account mapping
+        Map<String, List<Integer>>emailToAccounts = new HashMap<>();
+        for(int i = 0; i < accounts.size(); i++){
+            for(int j = 1; j < accounts.get(i).size(); j++){
+                String email = accounts.get(i).get(j);
+                emailToAccounts.computeIfAbsent(email, k -> new ArrayList<>()).add(i);
+            }
+        }
+        // // build the adjacency List
+        List<Set<Integer>>adj = new ArrayList<>();
+        for(int i = 0; i < accounts.size(); i++){
+            adj.add(new HashSet<>());
+        }
+
+        // connect all accounts that share the same email
+
+        for(List<Integer>accountList : emailToAccounts.values()){
+            for(int i = 0; i < accountList.size(); i++){
+                for(int j = i + 1; j < accountList.size(); j++){
+                    int acc1 = accountList.get(i);
+                    int acc2 = accountList.get(j);
+                    adj.get(acc1).add(acc2);
+                    adj.get(acc2).add(acc1);
+                }
+            }
+        }
+
+        // dfs to find the connected components
+        boolean[] vis = new boolean[accounts.size()];
+        List<List<String>>res = new ArrayList<>();
+        for(int i = 0; i < accounts.size(); i++){
+            if(!vis[i]){
+                // find all accounts in this CC 
+                Set<Integer>component = new HashSet<>();
+                dfs(i, adj, vis, component);
+
+                Set<String>emails = new HashSet<>();
+                String name = accounts.get(i).get(0);
+                for(int accountIdx : component){
+                   for(int j = 1; j < accounts.get(accountIdx).size(); j++){
+                    emails.add(accounts.get(accountIdx).get(j));
+                   }
+                }
+                List<String>sortedEmail = new ArrayList<>(emails);
+                Collections.sort(sortedEmail);
+                List<String>mergeAccounts = new ArrayList<>();
+                mergeAccounts.add(name);
+                mergeAccounts.addAll(sortedEmail);
+                res.add(mergeAccounts);
+            }
+        }
+        return res;
+
+    }
+    private void dfs(int accountIdx, List<Set<Integer>>adj, boolean[] vis, Set<Integer>component){
+         if(vis[accountIdx]){
+            return ;
+         }
+         vis[accountIdx] = true;
+         component.add(accountIdx);
+         for(int child : adj.get(accountIdx)){
+            if(!vis[child]){
+                dfs(child, adj,vis,component);
+            }
+         }
+    }
+}
