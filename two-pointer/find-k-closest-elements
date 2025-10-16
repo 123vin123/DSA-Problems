@@ -1,0 +1,24 @@
+This problme can simple solve with Collections.sort but that is not efficient.
+To solve efficiently we can use 2-pointer approach.
+Problem:
+The goal is to find a contiguous block of k numbers in a sorted array that are closest to a value x. Since the input array arr is already sorted, any subarray we pick will also be sorted, 
+so we don't have to worry about re-sorting the result. The problem boils down to finding the correct starting and ending points of this block.
+For each block of size k  we could calculate a "total distance" to x and keep track of the block with the minimum total distance. This feels complicated and inefficient (O(n*k)). 
+We can do better.
+Reframing the Problem: Instead of finding the k elements to keep, let's think about the n - k elements we need to discard.
+
+The problem is to find the k closest elements.
+This is the same as discarding the n - k farthest elements.
+Leveraging the "Sorted" Property: This is the most important hint. Where are the "farthest" elements in a sorted array likely to be?
+
+The smallest numbers are at the beginning of the array.
+The largest numbers are at the end of the array.
+Therefore, the elements that are most likely to be farthest from x are arr[0] and arr[arr.length - 1].
+Developing the Two-Pointer Strategy:
+
+This leads to a "shrinking window" idea. Let's start with a window that covers the entire array, using two pointers: left = 0 and right = arr.length - 1.
+The current window size is right - left + 1. We want to shrink this window until its size is exactly k.
+In each step, we must decide whether to discard the element at left or the element at right. The choice is simple: discard the one that is farther from x.
+So, we compare the distance of arr[left] from x with the distance of arr[right] from x.
+distance_left = |arr[left] - x|
+distance_right = |arr[right] - x|
