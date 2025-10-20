@@ -1,0 +1,31 @@
+Problem link : https://leetcode.com/problems/largest-rectangle-in-histogram/
+Thought Process:
+The core idea is to split the problem recursively. For any given range of bars, the largest rectangle must be in one of three places:
+
+Entirely in the left half: The largest rectangle is found within the left subarray.
+Entirely in the right half: The largest rectangle is found within the right subarray.
+Crossing the middle: The largest rectangle spans across the midpoint, using bars from both the left and right halves.
+This structure naturally leads to a recursive solution:
+
+Divide: Split the array of heights into two halves at a mid index.
+Conquer:
+Recursively call the function on the left half (start to mid) to find the largest area there.
+Recursively call the function on the right half (mid + 1 to end) to find the largest area there.
+Combine: This is the most crucial step. Calculate the largest area for a rectangle that crosses the mid point. The final answer is the maximum of the results from the left half, 
+the right half, and the crossing area.
+
+
+How to Calculate the Crossing Area
+This is the clever part of the algorithm. We know this rectangle must include the mid bar. So, we can start with a rectangle of just the mid bar and expand outwards.
+
+Initialize: Start with a rectangle centered at mid. Let two pointers, l = mid and r = mid. The initial height is heights[mid], width is 1, and area is heights[mid].
+Expand: In a loop, expand the rectangle one bar at a time by moving either l to the left or r to the right.
+Expansion Strategy: At each step, which way should we expand? We should choose the direction that has the taller bar. By moving towards the taller neighbor, we have a better chance of
+maintaining a large height for our rectangle.
+If the bar at l - 1 is taller than the bar at r + 1, move l to the left (l--).
+Otherwise, move r to the right (r++).
+(Handle edge cases where l or r is at the boundary).
+Update Area: After each expansion, the new width is r - l + 1. The height is now limited by the shortest bar within the current [l, r] window. We must update our minimum height accordingly. 
+Then, we calculate the new area (new_width * min_height) and update our max_crossing_area if it's larger.
+Termination: Continue this expansion until both l and r have reached the boundaries of the current subproblem (start and end).
+The final result of the function call is max(left_area, right_area, crossing_area).
