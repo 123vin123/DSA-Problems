@@ -1,0 +1,27 @@
+# Problem link: https://leetcode.com/problems/decode-string/
+## Thought
+When we iterate through the string, we need a way to "pause" our work on the current string and start building a new, nested one when we encounter a [. 
+Similarly, when we hit a ], we need to "resume" our previous work, using the just-completed nested string.
+
+A stack is the perfect data structure for this "pause and resume" logic. We need to save two pieces of information when we see a [:
+
+The repeat count for the new section we are about to build.
+The string we had built before starting this new section.
+Therefore, we use two stacks: one for the counts (countStack) and one for the strings (stringStack).
+
+## Algorithm Steps
+Initialize two stacks: countStack for integers and stringStack for StringBuilder objects.
+Initialize currentNum to 0 and currentString as an empty StringBuilder.
+Iterate through the input string character by character (ch):
+If ch is a digit, update currentNum = currentNum * 10 + (ch - '0'). This handles multi-digit numbers like 12.
+If ch is '[':
+Push the currentNum onto countStack.
+Push the currentString onto stringStack.
+Reset currentNum = 0 and currentString to an empty StringBuilder to start building the new, nested string.
+If ch is ']':
+Pop the repeat count from countStack. Let's call it repeatCount.
+Pop the previous string from stringStack. Let's call it prevString.
+Append the currentString to prevString for repeatCount times.
+Update currentString to be this newly formed prevString.
+If ch is a letter, simply append it to currentString.
+After the loop, currentString will hold the final decoded string.
