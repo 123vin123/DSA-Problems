@@ -1,0 +1,90 @@
+**this problem is varient of Grouping words**
+Problem -> Count Pairs of Words With Same Unique Characters
+Solution -> 
+Map<Integer, Integer> map = new HashMap<>();
+
+for(String word : words){
+    int mask = 0;
+
+    for(char c : word.toCharArray()){
+        mask |= 1 << (c - 'a');
+    }
+
+    map.put(mask, map.getOrDefault(mask,0)+1);
+}
+
+int pairs = 0;
+
+for(int count : map.values()){
+    pairs += count * (count-1) / 2;
+}
+
+return pairs;
+
+
+**second variation count pairs with no common char**
+
+int n = words.length;
+    int[] masks = new int[n];
+
+    // Step 1: build masks
+    for (int i = 0; i < n; i++) {
+        int mask = 0;
+        for (char c : words[i].toCharArray()) {
+            mask |= 1 << (c - 'a');
+        }
+        masks[i] = mask;
+    }
+
+    // Step 2: compare all pairs
+    int count = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if ((masks[i] & masks[j]) == 0) {
+                count++;
+            }
+        }
+    }
+
+    return count;
+TC-> O(N^2)
+MORE OPTIMISED SOLUTION
+
+ Map<Integer, Integer> freq = new HashMap<>();
+
+    for (String word : words) {
+        int mask = 0;
+        for (char c : word.toCharArray()) {
+            mask |= 1 << (c - 'a');
+        }
+        freq.put(mask, freq.getOrDefault(mask, 0) + 1);
+    }
+
+    int count = 0;
+
+    List<Integer> masks = new ArrayList<>(freq.keySet());
+
+    // Step 2: Compare unique masks
+    for (int i = 0; i < masks.size(); i++) {
+        for (int j = i; j < masks.size(); j++) {
+
+            int m1 = masks.get(i);
+            int m2 = masks.get(j);
+
+            if ((m1 & m2) == 0) {
+
+                if (i == j) {
+                    // same mask group
+                    int f = freq.get(m1);
+                    count += f * (f - 1) / 2;
+                } else {
+                    count += freq.get(m1) * freq.get(m2);
+                }
+            }
+        }
+    }
+
+    return count;
+TC->N+(k^2)
+
+
